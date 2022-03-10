@@ -1,0 +1,133 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt  # To visualize
+import scipy.stats
+from sklearn.linear_model import LinearRegression
+data = pd.read_csv('Data/znnew.csv')
+
+print(data)
+   Concentration  Z-effective     %ED     HU
+0              0         7.03   99.79  -9.55
+1             50         7.10   99.84  -6.28
+2            100         7.13  100.16  -1.06
+3            150         7.22  100.11   2.24
+4            200         7.27  100.17   5.39
+5            250         7.33  100.29   9.36
+6            300         7.37  100.21  11.32
+7            350         7.43  100.32  14.90
+8            400         7.46  100.36  16.85
+9            500         7.58  100.30  21.82
+10           600         7.67  100.48  27.74
+11           700         7.79  100.60  35.42
+12           800         7.86  100.76  40.02
+13           900         7.97  100.80  46.94
+14         1,000         8.02  100.92  51.66
+15         1,100         8.12  100.90  57.54
+16         1,200         8.19  101.28  67.11
+data.columns
+
+Index(['Concentration', 'Z-effective', '%ED', 'HU'], dtype='object')
+zeff = data['Z-effective']
+
+zeff
+0     7.03
+1     7.10
+2     7.13
+3     7.22
+4     7.27
+5     7.33
+6     7.37
+7     7.43
+8     7.46
+9     7.58
+10    7.67
+11    7.79
+12    7.86
+13    7.97
+14    8.02
+15    8.12
+16    8.19
+Name: Z-effective, dtype: float64
+
+ed = data['%ED']
+ed
+0      99.79
+1      99.84
+2     100.16
+3     100.11
+4     100.17
+5     100.29
+6     100.21
+7     100.32
+8     100.36
+9     100.30
+10    100.48
+11    100.60
+12    100.76
+13    100.80
+14    100.92
+15    100.90
+16    101.28
+Name: %ED, dtype: float64
+hu = data['HU']
+
+print(hu)
+0     -9.55
+1     -6.28
+2     -1.06
+3      2.24
+4      5.39
+5      9.36
+6     11.32
+7     14.90
+8     16.85
+9     21.82
+10    27.74
+11    35.42
+12    40.02
+13    46.94
+14    51.66
+15    57.54
+16    67.11
+
+Name: HU, dtype: float64
+data2 = pd.DataFrame(data)
+data2['Concentration'] = pd.to_numeric(data2['Concentration'],errors='coerce')
+data2= data2.replace(np.nan,0)
+data2.iloc[14,0] = 1000
+data2.iloc[15,0] = 1100
+data2.iloc[16,0] = 1200 #to replace a value with another
+data2
+
+Concentration	Z-effective	%ED	HU
+0	0.0	7.03	99.79	-9.55
+1	50.0	7.10	99.84	-6.28
+2	100.0	7.13	100.16	-1.06
+3	150.0	7.22	100.11	2.24
+4	200.0	7.27	100.17	5.39
+5	250.0	7.33	100.29	9.36
+6	300.0	7.37	100.21	11.32
+7	350.0	7.43	100.32	14.90
+8	400.0	7.46	100.36	16.85
+9	500.0	7.58	100.30	21.82
+10	600.0	7.67	100.48	27.74
+11	700.0	7.79	100.60	35.42
+12	800.0	7.86	100.76	40.02
+13	900.0	7.97	100.80	46.94
+14	1000.0	8.02	100.92	51.66
+15	1100.0	8.12	100.90	57.54
+16	1200.0	8.19	101.28	67.11
+
+ccn = data2['Concentration']
+#Zinc ccn and Z-effective graph generation with regression line and equation
+slope, intercept, rccnzeff, pcczeff, stder = scipy.stats.linregress(ccn, zeff)
+line = f'Regression line: zeff={intercept:.3f}+{slope:.3f}ccn, rsq={rccnzeff**2:.3f}'
+line
+'Regression line: zeff=7.070+0.001ccn, rsq=0.995'
+fig, ax = plt.subplots()
+ax.plot(ccn, zeff, linewidth=0, marker='s', label='Ccn vs Z-effective')
+ax.plot(ccn, intercept + slope * ccn, label=line)
+ax.set_xlabel('Zn Concentration (µg/g)')#add units
+ax.set_ylabel('Z-effective')
+ax.legend(facecolor='white')
+plt.show()
